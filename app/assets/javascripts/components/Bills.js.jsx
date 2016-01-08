@@ -2,7 +2,7 @@ class Bills extends React.Component{
   constructor(props){
     super(props);
     this.refreshBills = this.refreshBills.bind(this);
-    this.toggleBill = this.toggleBill.bind(this);
+    this.toggleAddBill = this.toggleAddBill.bind(this);
     this.addBillForm = this.addBillForm.bind(this);
     this.state = {bills: []};
   }
@@ -16,39 +16,37 @@ class Bills extends React.Component{
       url: "/bills",
       type: "GET"
     }).success( data => {
-      this.setState({bills: data});
+      this.setState({bills: data.bills});
     });
   }
 
-  toggleBill(){
+  toggleAddBill(){
     this.setState({showForm: !this.state.showForm});
   }
 
-  updateBill(){
+  createBill(){
     let name = this.refs.billName.value;
     let amount = this.refs.billAmount.value;
     $.ajax({
       url: "/bills",
-      type: "PUT",
+      type: "POST",
       data: {bill: {name, amount}}
     }).success( data => {
-      this.props.refreshBills();
+      let bills = data.state.bills;
+      bills.push(data.bill)
+      this.setState(bills);
     });
   }
 
   addBillForm(){
     if(this.state.showForm){
       return(<div>
-              <form onSubmit={() => this.updateBill}>
-                <input autoFocus={true} type="text" ref="billName" placeholder="Bill Name" />
-                <input type="number" step="any" ref="billAmount" placeholder="Bill Amount" />
+              <form onSubmit={() => this.createBill()}>
+                <input autoFocus={true} type="text" ref="billName" placeholder="Bill Name" required />
+                <input type="number" step="any" ref="billAmount" placeholder="Bill Amount" required />
                 <button type="submit" className="waves-effect waves-light btn">Submit</button>
-                <a onClick={this.toggleBill}>Cancel</a>
+                <a onClick={this.toggleAddBill}>Cancel</a>
               </form>
-            </div>);
-    } else {
-      return(<div>
-              <h6 className="center">You have no bills. Please add bills.</h6>
             </div>);
     }
   }
@@ -57,17 +55,30 @@ class Bills extends React.Component{
     let bills = this.state.bills.map( bill => {
       return(<Bill refreshBills={this.refreshBills} key={`bill-${bill.id}`} {...bill} />);
     });
-    return(<div className="container">
-            <h2 className="center">Bills</h2>
-            <div className="row">
-              <div>
-                <button className="waves-effect waves-light btn" onClick={this.toggleBill}>Add Bill</button>
-                {this.addBillForm()}
-              </div>
+    if(bills.length == 0){
+      return(<div className="container">
+              <h2 className="center">Bills</h2>
               <div className="row">
-                {bills}
+                <div>
+                  <button className="waves-effect waves-light btn" onClick={this.toggleAddBill}>Add Bill</button>
+                  {this.addBillForm()}
+                  <h5 className="center">No bills. Please add some.</h5>
+                </div>
               </div>
-            </div>
-          </div>);
+            </div>);
+    } else {
+      return(<div className="container">
+              <h2 className="center">Bills</h2>
+              <div className="row">
+                <div>
+                  <button className="waves-effect waves-light btn" onClick={this.toggleAddBill}>Add Bill</button>
+                  {this.addBillForm()}
+                </div>
+                <div className="row">
+                  {bills}
+                </div>
+              </div>
+            </div>);
+    }
   }
 }
