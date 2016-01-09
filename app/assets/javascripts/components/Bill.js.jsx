@@ -42,7 +42,7 @@ class Bill extends React.Component{
   }
 
   bill(){
-    return(<div className="card-small blue-grey">
+    return(<div className="card-small blue-grey col s3 offset-s1">
             <div className="card-content white-text">
               <h5 className="left-align">{this.props.name}</h5>
               <p className="left-align">${this.props.amount}</p>

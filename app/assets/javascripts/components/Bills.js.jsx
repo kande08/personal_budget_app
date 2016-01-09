@@ -74,6 +74,7 @@ class Bills extends React.Component{
                   <button className="waves-effect waves-light btn" onClick={this.toggleAddBill}>Add Bill</button>
                   {this.addBillForm()}
                 </div>
+                <br />
                 <div className="row">
                   {bills}
                 </div>
